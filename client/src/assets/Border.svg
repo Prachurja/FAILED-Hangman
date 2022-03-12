@@ -1,0 +1,5 @@
+<!-- Source: https://kovart.github.io/dashed-border-generator/ -->
+
+<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'>
+    <rect width='100%' height='100%' fill='none' rx='24' ry='24' stroke='black' stroke-width='1' stroke-dasharray='9' stroke-dashoffset='0' stroke-linecap='square'/>
+</svg>
