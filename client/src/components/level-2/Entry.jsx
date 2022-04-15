@@ -15,7 +15,7 @@ function Entry() {
                 setHovering={setHovering}
                 button={<button className={"col-start-2 text-2xl font-[FontAwesome] fa-solid fa-door-" + (hovering ? "open" : "closed")} onClick={() => setHovering(true)}></button>}
                 containerClassName="sm:hidden sm:items-center"
-                menuClassName="w-36"
+                menuClassName="w-[10rem]"
             >
                 <div className="p-8">
                     <ul className="flex flex-col gap-1">
