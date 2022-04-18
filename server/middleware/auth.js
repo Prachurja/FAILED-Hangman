@@ -6,22 +6,24 @@ module.exports = async (req, res, next) => {
         let success = false
 
         if(req.headers.authorization) {
-            const userId = jwt.verify(req.headers.authorization, process.env.JWT_SECRET)._id
-            
-            if(await User.findById(userId)) {
+            let {_id, iat} = jwt.verify(req.headers.authorization, process.env.JWT_SECRET + "login")
+            const user = await User.findById(_id)
+
+            iat = iat*1000
+
+            if(user && (!user.passwordResetIAT || (user.passwordResetIAT && iat > user.passwordResetIAT)) && (!user.emailResetIAT || (user.emailResetIAT && iat > user.emailResetIAT))) {
                 success = true
-                req.userId = userId
+                req.user = user
                 next()
             }
         }
 
         if(!success) {
-            res.sendStatus(401)
+            res.status(401).send({ message: "Please login" })
         }
     }
 
     catch(err) {
-        res.sendStatus(401)
         next(err)
     }
 }

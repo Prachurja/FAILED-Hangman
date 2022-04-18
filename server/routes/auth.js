@@ -1,17 +1,31 @@
 const router = require("express").Router()
 const User = require("../models/User")
 const jwt = require("jsonwebtoken")
+const sendEmail = require("../utils/sendEmail")
 
 router.post("/login", async (req, res, next) => {
     try {
         const { email, password } = req.body
-        const user = await User.findOne({ email })
-        
-        if(user && user.matchPassword(password)) res.send({ token: jwt.sign({ _id: user._id }, process.env.JWT_SECRET) })
-        else res.status(401).send({ message: "Invalid email or password" })
+
+        let errorMessage = {}
+        if(!email) errorMessage.email = "Please provide email"
+        if(!password) errorMessage.password = "Please provide password"
+
+
+        if(email && password) {
+            const user = await User.findOne({ email })
+
+            if(user && user.matchPassword(password)) res.send({ token: user.generateJWT(process.env.JWT_SECRET + "login"), message: "Login successful" })
+            else res.status(401).send({ message: "Invalid email or password" })
+        }
+
+        else {
+            res.status(400).send({ message: errorMessage })
+        }
     }
 
     catch(err) {
+        console.log(err.message)
         next(err)
     }
 })
@@ -27,9 +41,13 @@ router.post("/signup", async (req, res, next) => {
 
             for(let i = 1; i <= 5 && !fulfilled; i++) {
                 if(!await User.findOne({ username, discriminator })) {
-                    const newUser = await User.create({ username, discriminator, email, password })
-                    res.send({ token: jwt.sign({ _id: newUser._id }, process.env.JWT_SECRET) })
-
+                    const newUser = await User.create({ username, discriminator, email, password, expireAt: new Date(Date.now() + 3*24*60*60*1000) })
+                    sendEmail({
+                        to: newUser.email,
+                        subject: "Hangman Email Verification",
+                        text: newUser.generateJWT(process.env.JWT_SECRET + "verifyemail")
+                    })
+                    res.status(200).send({ message: "Please check your inbox and verify your account" })
                     fulfilled = true
                 }
 
@@ -40,6 +58,43 @@ router.post("/signup", async (req, res, next) => {
         }
 
         else res.status(409).send({ message: { email: "Email already exists"}})
+    }
+
+    catch(err) {
+        next(err)
+    }
+})
+
+router.post("/resendEmailVerification", require("../middleware/auth"), (req, res, next) => {
+    try {
+        sendEmail({
+            to: req.user.email,
+            subject: "Hangman Email Verification",
+            text: req.user.generateJWT(process.env.JWT_SECRET + "verifyemail")
+        })
+
+        res.status(200).send({ message: "Email verification link sent" })
+    }
+
+    catch(err) {
+        next(err)
+    }
+})
+
+router.post("/verifyemail/:verifyemailtoken", async (req, res, next) => {
+    try {
+        const { _id } = jwt.verify(req.params.verifyemailtoken, process.env.JWT_SECRET + "verifyemail")
+        const user = await User.findById(_id)
+
+        if(user) {
+            user.expireAt = undefined
+            user.save()
+            res.status(200).send({ message: "Email verified successfully" })
+        }
+
+        else {
+            res.status(404).send({ message: "Email verification token expired" })
+        }
     }
 
     catch(err) {

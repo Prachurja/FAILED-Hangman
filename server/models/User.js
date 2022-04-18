@@ -1,4 +1,6 @@
 const mongoose = require("mongoose")
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -17,15 +19,22 @@ const UserSchema = new mongoose.Schema({
         required: [true, "Please provide an email"],
         match: [/^(([\w\d].{0,62}[\w\d])|([\w\d]{1,64}))@(?=.{1,63}(\..{1,63}){1,2}$)[\d\w]+-?[\d\w]+(\.[\d\w]+-?[\d\w]+){1,2}$/, "Invalid email"]
     },
+    emailResetIAT: {
+        type: Date,
+        validator: function(iat) {
+            return iat >= Date.now()
+        }
+    },
     password: {
         type: String,
         required: [true, "Please provide a password"],
         match: [/^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).*){8,}/, "Password must be 8 characters in length, with a combination of numbers and uppercase and lowercase letters"]
     },
-    passwordResetToken: {
-        type: String,
-        unique: true,
-        match: [/^\d{4}$/, "Reset token must be 4 digits in length"]
+    passwordResetIAT: {
+        type: Date,
+        validator: function(iat) {
+            return iat >= Date.now()
+        }
     },
     friends: [{
         type: mongoose.SchemaTypes.ObjectId,
@@ -34,10 +43,14 @@ const UserSchema = new mongoose.Schema({
     blocked: [{ 
         type: mongoose.SchemaTypes.ObjectId,
         ref: "User"
-    }]
+    }],
+    expireAt: {
+        type: Date
+    },
 })
 
-const bcrypt = require("bcrypt")
+UserSchema.index({ "expireAt": 1 }, { expireAfterSeconds: 0 })
+
 UserSchema.pre("save", function (next) {
     if(this.isModified("password")) {
         this.password = bcrypt.hashSync(this.password, 10)
@@ -50,8 +63,12 @@ UserSchema.pre("save", function (next) {
     next()
 })
 
-UserSchema.methods.matchPassword = function (password) {
+UserSchema.methods.matchPassword = function(password) {
     return bcrypt.compareSync(password, this.password)
+}
+
+UserSchema.methods.generateJWT = function(key, options, additionalData) {
+    return jwt.sign({ _id: this._id, ...(additionalData || {}) }, key, options)
 }
 
 module.exports = mongoose.model("User", UserSchema)
