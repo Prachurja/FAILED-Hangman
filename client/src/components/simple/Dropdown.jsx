@@ -1,6 +1,6 @@
 import { useState } from "react"
-import Button from "../level-4/Button"
-import Menu from "../level-3/Menu"
+import Button from "../core/Button"
+import Menu from "../basic/Menu"
 
 function Dropdown({title, options}) {
     const [hovering, setHovering] = useState(false)
@@ -22,8 +22,8 @@ function Dropdown({title, options}) {
                 options={
                     options.map((option, index) => (
                         <>
-                            <input type="radio" name={title} id={index} value={option} className="appearance-none" onChange={() => setSelection(option)} />
-                            <label htmlFor={index} className="px-[inherit] py-[inherit] [font-size:inherit] absolute top-0 left-0 h-full w-full">{option}</label>
+                            <input type="radio" name={title} id={index} value={option.title} className="appearance-none" onChange={option.onClick || (() => setSelection(option.title))} />
+                            <label htmlFor={index} className="px-[inherit] py-[inherit] [font-size:inherit] absolute top-0 left-0 h-full w-full">{option.title}</label>
                         </>
                     ))
                 }

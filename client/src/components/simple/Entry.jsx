@@ -1,5 +1,6 @@
 import { useState } from "react"
-import NavMenu from "../level-3/NavMenu"
+import NavMenu from "../basic/NavMenu"
+import { LoginButton, SignupButton } from "../basic/AuthButtons"
 
 function Entry() {
     const [hovering, setHovering] = useState(false)
@@ -7,8 +8,8 @@ function Entry() {
     return (
         <>
             <ul className="hidden sm:flex justify-end gap-20 items-center">
-                <li className="text-lg cursor-pointer">Login</li>
-                <li className="text-lg cursor-pointer">Sign Up</li>
+                <li className="text-lg cursor-pointer"><LoginButton /></li>
+                <li className="text-lg cursor-pointer"><SignupButton /></li>
             </ul>
             <NavMenu
                 hovering={hovering}
@@ -19,8 +20,8 @@ function Entry() {
             >
                 <div className="p-8">
                     <ul className="flex flex-col gap-1">
-                        <li className="cursor-pointer font-medium text-[0.9rem]">Sign In</li>
-                        <li className="cursor-pointer font-medium text-[0.9rem]">Login</li>
+                        <li className="cursor-pointer font-medium text-[0.9rem]"><LoginButton additionalOnClick={() => setHovering(false)} /></li>
+                        <li className="cursor-pointer font-medium text-[0.9rem]"><SignupButton additionalOnClick={() => setHovering(false)} /></li>
                     </ul>
                 </div>
             </NavMenu>

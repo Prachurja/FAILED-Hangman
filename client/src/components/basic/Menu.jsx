@@ -1,4 +1,4 @@
-import HoveringDiv from "../level-4/HoveringDiv"
+import HoveringDiv from "../core/HoveringDiv"
 
 function Menu({hovering, setHovering, variants, options}) {
     return (
