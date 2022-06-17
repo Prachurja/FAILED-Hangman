@@ -2,6 +2,8 @@ const router = require("express").Router()
 const User = require("../models/User")
 const jwt = require("jsonwebtoken")
 const sendEmail = require("../utils/sendEmail")
+const path = require("path")
+const fs = require("fs")
 
 router.post("/login", async (req, res, next) => {
     try {
@@ -19,9 +21,7 @@ router.post("/login", async (req, res, next) => {
             else res.status(401).send({ message: "Invalid email or password" })
         }
 
-        else {
-            res.status(400).send({ message: errorMessage })
-        }
+        else res.status(400).send({ message: errorMessage })
     }
 
     catch(err) {
@@ -39,19 +39,29 @@ router.post("/signup", async (req, res, next) => {
             let discriminator = getNewDiscriminator()
             let fulfilled = false
 
-            for(let i = 1; i <= 5 && !fulfilled; i++) {
-                if(!await User.findOne({ username, discriminator })) {
-                    const newUser = await User.create({ username, discriminator, email, password, expireAt: new Date(Date.now() + 3*24*60*60*1000) })
-                    sendEmail({
-                        to: newUser.email,
-                        subject: "Hangman Email Verification",
-                        text: newUser.generateJWT(process.env.JWT_SECRET + "verifyemail")
-                    })
-                    res.status(200).send({ message: "Please check your inbox and verify your account" })
-                    fulfilled = true
-                }
+            if((await User.find({ username })).length < 30) {
+                for(let i = 1; i <= 5 && !fulfilled; i++) {
+                    if(!await User.findOne({ username, discriminator })) {
+                        const newUser = new User({ username, discriminator, email, password, expireAt: new Date(Date.now() + 3*24*60*60*1000) })
 
-                else discriminator = getNewDiscriminator()
+                        if(req.files?.avatar) {
+                            await req.files.avatar.mv(path.join(__dirname, `../uploads/temp/avatars/${newUser.expireAt.getTime()} ${newUser._id}.jpg`))
+                            newUser.avatar = `http://localhost:5000/temp/avatars/${newUser.expireAt.getTime()} ${newUser._id}.jpg`
+                        }
+                        
+                        await newUser.save()
+
+                        sendEmail({
+                            to: newUser.email,
+                            subject: "Hangman Email Verification",
+                            text: newUser.generateJWT(process.env.JWT_SECRET + "verifyemail")
+                        })
+                        res.status(200).send({ message: "Please check your inbox and verify your account" })
+                        fulfilled = true
+                    }
+    
+                    else discriminator = getNewDiscriminator()
+                }
             }
 
             if(!fulfilled) res.status(400).send({ message: { username: "Username too common" }})
@@ -87,14 +97,15 @@ router.post("/verifyemail/:verifyemailtoken", async (req, res, next) => {
         const user = await User.findById(_id)
 
         if(user) {
+            user.avatar = user.avatar.replace("/temp", "")
+            fs.renameSync(path.join(__dirname, `../uploads/temp/avatars/${user.expireAt.getTime()} ${user._id}.jpg`), path.join(__dirname, `../uploads/avatars/${user._id}.jpg`))
             user.expireAt = undefined
             user.save()
+
             res.status(200).send({ message: "Email verified successfully" })
         }
 
-        else {
-            res.status(404).send({ message: "Email verification token expired" })
-        }
+        else res.status(404).send({ message: "Email verification token expired" })
     }
 
     catch(err) {

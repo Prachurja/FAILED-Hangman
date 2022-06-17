@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema({
         required: [true, "Please provide an email"],
         match: [/^(([\w\d].{0,62}[\w\d])|([\w\d]{1,64}))@(?=.{1,63}(\..{1,63}){1,2}$)[\d\w]+-?[\d\w]+(\.[\d\w]+-?[\d\w]+){1,2}$/, "Invalid email"]
     },
+    avatar: {
+        type: String,
+        required: [true, "Please choose or upload your avatar"]
+    },
     emailResetIAT: {
         type: Date,
         validator: function(iat) {

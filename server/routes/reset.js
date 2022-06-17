@@ -20,24 +20,16 @@ router.post("/getEmailResetToken", async (req, res, next) => {
                         res.status(200).send({ message: `Email reset link sent successfully to ${user.email}` })
                     }
     
-                    else {
-                        res.status(400).send({ message: "You can change your email only once every five hours" })
-                    }
+                    else res.status(400).send({ message: "You can change your email only once every five hours" })
                 }
     
-                else {
-                    res.status(401).send({ message: "Please check your inbox and verify your account" })
-                }
+                else res.status(401).send({ message: "Please check your inbox and verify your account" })
             }
 
-            else {
-                res.status(404).send({ message: "User not found" })
-            }
+            else res.status(404).send({ message: "User not found" })
         }
 
-        else {
-            res.status(400).send({ message: { currentEmail: "Please provide your current email" }})
-        }
+        else res.status(400).send({ message: { currentEmail: "Please provide your current email" }})
     }
 
     catch(err) {
@@ -102,24 +94,16 @@ router.post("/getPasswordResetToken", async (req, res, next) => {
                         res.status(200).send({ message: `Password reset link sent successfully to ${user.email}` })
                     }
     
-                    else {
-                        res.status(400).send({ message: "You can change your password only once every five hours" })
-                    }
+                    else res.status(400).send({ message: "You can change your password only once every five hours" })
                 }
     
-                else {
-                    res.status(401).send({ message: "Please check your inbox and verify your account" })
-                }
+                else res.status(401).send({ message: "Please check your inbox and verify your account" })
             }
 
-            else {
-                res.status(404).send({ message: "User not found" })
-            }
+            else res.status(404).send({ message: "User not found" })
         }
 
-        else {
-            res.status(400).send({ message: { currentEmail: "Please provide your current email" }})
-        }
+        else res.status(400).send({ message: { currentEmail: "Please provide your current email" }})
     }
 
     catch(err) {
@@ -139,9 +123,7 @@ router.post("/resetPassword/:passwordResetToken", async (req, res, next) => {
             res.status(200).send({ message: "Password reset successfully" })
         }
 
-        else {
-            res.status(400).send({ message: { newPassword: "Please provide the new password" }})
-        }
+        else res.status(400).send({ message: { newPassword: "Please provide the new password" }})
     }
 
     catch(err) {
