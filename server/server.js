@@ -1,8 +1,5 @@
 if(process.env.NODE_ENV != "production") require("dotenv").config()
 
-const cron = require("node-cron")
-cron.schedule("0 0 * * * *", () => require("./utils/deleteExpiredFiles")(__dirname + "\\uploads"))
-
 const express = require("express")
 const app = express()
 

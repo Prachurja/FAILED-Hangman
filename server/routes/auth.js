@@ -42,15 +42,13 @@ router.post("/signup", async (req, res, next) => {
             if((await User.find({ username })).length < 30) {
                 for(let i = 1; i <= 5 && !fulfilled; i++) {
                     if(!await User.findOne({ username, discriminator })) {
-                        const newUser = new User({ username, discriminator, email, password, expireAt: new Date(Date.now() + 3*24*60*60*1000) })
-
-                        if(req.files?.avatar) {
-                            await req.files.avatar.mv(path.join(__dirname, `../uploads/temp/avatars/${newUser.expireAt.getTime()} ${newUser._id}.jpg`))
-                            newUser.avatar = `http://localhost:5000/temp/avatars/${newUser.expireAt.getTime()} ${newUser._id}.jpg`
+                        function getRandomAvatarURL() {
+                            const defaultAvatarsCount = fs.readdirSync(path.join(__dirname, "../uploads/avatars/default")).length
+                            const random = Math.floor(Math.random() * (defaultAvatarsCount - 1)) + 1
+                            return `http://localhost:5000/uploads/avatars/default/${random}.jpg`
                         }
-                        
-                        await newUser.save()
 
+                        const newUser = await User.create({ username, discriminator, email, password, expireAt: new Date(Date.now() + 3*24*60*60*1000), avatar: getRandomAvatarURL() })
                         sendEmail({
                             to: newUser.email,
                             subject: "Hangman Email Verification",

@@ -1,7 +1,7 @@
 import { useEffect, createRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
-function HoveringDiv({hovering, setHovering, variants, children, className, closeOnClick}) {
+function HoveringDiv({hovering, setHovering, variants, children, className, closeOnClick, transitionDuration=0.15}) {
     const mounted = createRef(false)
     
     useEffect(() => {
@@ -25,7 +25,7 @@ function HoveringDiv({hovering, setHovering, variants, children, className, clos
                     initial="hidden"
                     exit="hidden"
                     animate="visible"
-                    transition={{duration: 0.15}}
+                    transition={{duration: transitionDuration, type: "spring"}}
                     {...(closeOnClick ? {} : { onClick: (event => event.stopPropagation())})}
                 >{
                     children
