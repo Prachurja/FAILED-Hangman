@@ -1,33 +1,34 @@
-import { LoginButton } from "../basic/AuthButtons";
-import AuthModal from "../basic/AuthModal";
-import { useSignupOpen } from "../core/AuthContext";
+import { useState } from "react";
+import { LoginButton } from "./Buttons";
+import AuthModal from "./AuthModal";
+import { useSignupOpen } from "../general/Context";
+import Image from "../notice/Image";
 
-function Signup() {
+export default function Signup() {
     const signupOpenState = useSignupOpen()
-
-    function handleSubmit(event) {
-        console.log("signup!")
-    }
 
     return (
         <AuthModal
             name="Sign up"
-            fields={[
-                {
-                    name: "Username",
+            fields={{
+                "username": {
+                    title: "Username",
                     regex: /^[^#]+$/,
-                    errorText: "Username cannot contain #"
+                    errorText: "Username cannot contain #",
+                    temporaryErrorTextState: useState(),
                 },
-                {
-                    name: "Email",
+                "email": {
+                    title: "Email",
                     regex: /^(([\w\d].{0,62}[\w\d])|([\w\d]{1,64}))@(?=.{1,63}(\..{1,63}){1,2}$)[\d\w]+-?[\d\w]+(\.[\d\w]+-?[\d\w]+){1,2}$/,
                     errorText: "Please provide a valid email",
-                    afterSubmit: true
+                    afterSubmit: true,
+                    temporaryErrorTextState: useState()
                 },
-                {
-                    name: "Password",
-                    regex: /^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).*){8,}/,
+                "password": {
+                    title: "Password",
+                    regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
                     errorText: "Password must have",
+                    temporaryErrorTextState: useState(),
                     errors: [
                         {
                             regex: /^.{8,}$/,
@@ -47,14 +48,13 @@ function Signup() {
                         }
                     ]
                 }
-            ]}
+            }}
             otherAuthText="Already have an account?"
             otherAuthButton={<LoginButton className="text-blue-500" />}
-            modalOpen={signupOpenState.signupOpen}
-            setModalOpen={signupOpenState.setSignupOpen}
-            handleSubmit={handleSubmit}
+            modalOpen={signupOpenState[0]}
+            setModalOpen={signupOpenState[1]}
+            submitURL="http://localhost:5000/api/auth/signup"
+            successImage={<Image iconClass="fa-envelope" iconStyle="fa-regular"/>}
         />
     )
 }
-
-export default Signup

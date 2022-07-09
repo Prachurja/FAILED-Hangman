@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, "Please provide a password"],
-        match: [/^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).*){8,}/, "Password must be 8 characters in length, with a combination of numbers and uppercase and lowercase letters"]
+        match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, "Password must be 8 characters in length, with a combination of numbers and uppercase and lowercase letters"]
     },
     passwordResetIAT: {
         type: Date,
@@ -60,10 +60,6 @@ UserSchema.pre("save", function (next) {
         this.password = bcrypt.hashSync(this.password, 10)
     }
     
-    if(this.passwordResetToken && this.isModified("passwordResetToken")) {
-        this.passwordResetToken = bcrypt.hashSync(this.passwordResetToken, 10)
-    }
-
     next()
 })
 

@@ -52,9 +52,9 @@ router.post("/signup", async (req, res, next) => {
                         sendEmail({
                             to: newUser.email,
                             subject: "Hangman Email Verification",
-                            text: newUser.generateJWT(process.env.JWT_SECRET + "verifyemail")
+                            text: `${process.env.NODE_ENV !== "production" ? "http://localhost:3000" : `${req.protocol}://${req.hostname}`}/auth/verifyemail/${newUser.generateJWT(process.env.JWT_SECRET + "verifyemail")}`
                         })
-                        res.status(200).send({ message: "Please check your inbox and verify your account" })
+                        res.status(200).send({ message: "Please check your inbox for link to verify your account" })
                         fulfilled = true
                     }
     
@@ -95,12 +95,10 @@ router.post("/verifyemail/:verifyemailtoken", async (req, res, next) => {
         const user = await User.findById(_id)
 
         if(user) {
-            user.avatar = user.avatar.replace("/temp", "")
-            fs.renameSync(path.join(__dirname, `../uploads/temp/avatars/${user.expireAt.getTime()} ${user._id}.jpg`), path.join(__dirname, `../uploads/avatars/${user._id}.jpg`))
             user.expireAt = undefined
-            user.save()
-
-            res.status(200).send({ message: "Email verified successfully" })
+            await user.save()
+            
+            res.status(200).send({ message: "Email verified successfully", token: user.generateJWT(process.env.JWT_SECRET + "login") })
         }
 
         else res.status(404).send({ message: "Email verification token expired" })

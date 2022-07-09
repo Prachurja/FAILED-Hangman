@@ -1,6 +1,6 @@
-import HoveringDiv from "../core/HoveringDiv"
+import HoveringDiv from "./HoveringDiv"
 
-function NavMenu({children, button, hovering, setHovering, containerClassName, menuClassName}) {
+export default function NavMenu({children, button, hovering, setHovering, containerClassName, menuClassName}) {
     return (
         <div className={"relative flex justify-end " + containerClassName}>
             <div className="absolute grid gap-2 [grid-template-columns:repeat(2, auto)] [grid-template-rows:repeat(2, auto)]">
@@ -20,5 +20,3 @@ function NavMenu({children, button, hovering, setHovering, containerClassName, m
         </div>
     )
 }
-
-export default NavMenu

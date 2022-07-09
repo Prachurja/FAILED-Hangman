@@ -1,8 +1,8 @@
 import { useState } from "react"
-import NavMenu from "../basic/NavMenu"
-import { LoginButton, SignupButton } from "../basic/AuthButtons"
+import NavMenu from "../utils/NavMenu"
+import { LoginButton, SignupButton } from "./Buttons"
 
-function Entry() {
+export default function Entry() {
     const [hovering, setHovering] = useState(false)
 
     return (
@@ -28,5 +28,3 @@ function Entry() {
         </>
     )
 }
-
-export default Entry

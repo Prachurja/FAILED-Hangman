@@ -1,4 +1,4 @@
-function Gamemode({title, description, play, demo, arrangeReverse}) {
+export default function Gamemode({title, description, play, demo, arrangeReverse}) {
     return (
         <>
             <div className="p-6 [border:dashed_1px_gray] bg-neutral-100 dark:bg-black rounded-[24px] flex-1 relative" style={{gridColumnStart: arrangeReverse ? "auto" : 1}}>
@@ -12,5 +12,3 @@ function Gamemode({title, description, play, demo, arrangeReverse}) {
         </>
     )
 }
-
-export default Gamemode

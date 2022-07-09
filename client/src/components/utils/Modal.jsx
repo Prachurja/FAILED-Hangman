@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion"
 
-function Modal({children, modalOpen, setModalOpen}) {
+export default function Modal({children, modalOpen, setModalOpen, className}) {
     return (
         <AnimatePresence initial={false} exitBeforeEnter={true}>{
             modalOpen &&
@@ -17,7 +17,7 @@ function Modal({children, modalOpen, setModalOpen}) {
                     exit={{translateX: "-100vw"}}
                     transition={{duration: "0.50", type: "spring"}}
                     onClick={e => e.stopPropagation()}
-                    className="p-3 bg-stone-200 dark:bg-black dark:text-white rounded-xl"
+                    className={"bg-stone-200 dark:bg-black dark:text-white rounded-xl w-[80vw] " + className}
                 >
                     {children}
                 </motion.div>
@@ -25,5 +25,3 @@ function Modal({children, modalOpen, setModalOpen}) {
         }</AnimatePresence>
     )
 }
-
-export default Modal

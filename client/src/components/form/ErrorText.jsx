@@ -1,11 +1,9 @@
-import HoveringDiv from "../core/HoveringDiv";
+import HoveringDiv from "../utils/HoveringDiv";
 
-function ErrorText({value, errorText, errors, hasError, setHasError, formSubmitting, notProvidedText}) {
-    const notProvided = formSubmitting && value === ""
-    
+export default function ErrorText({value, errorText, temporaryErrorText, errors, hasError, setHasError}) {
     return (
         <HoveringDiv
-            hovering={hasError || notProvided}
+            hovering={hasError || temporaryErrorText}
             setHovering={setHasError}
             variants={{
                 hidden: { opacity: 0, height: "0" },
@@ -14,9 +12,9 @@ function ErrorText({value, errorText, errors, hasError, setHasError, formSubmitt
             className="text-[0.7rem] text-red-500 [font-weight:500_!important] overflow-hidden"
             closeOnClick={false}
         >
-            {notProvided ? notProvidedText : errorText}
+            {temporaryErrorText ? temporaryErrorText : errorText}
             <ul>{
-                !notProvided &&
+                !temporaryErrorText &&
                 errors?.map(error => {
                     const {regex: errorRegex, errorText: errorErrorText} = error
                     const errorExists = !errorRegex.test(value)
@@ -32,5 +30,3 @@ function ErrorText({value, errorText, errors, hasError, setHasError, formSubmitt
         </HoveringDiv>
     )
 }
-
-export default ErrorText

@@ -1,10 +1,10 @@
 import { useRef, useState } from "react"
 import { average } from "color.js"
-import NavMenu from "../basic/NavMenu"
-import { useAuth } from "../core/AuthContext"
+import NavMenu from "../utils/NavMenu"
+import { useAuth } from "../general/Context"
 import { Link } from "react-router-dom"
 
-function Profile() {
+export default function Profile() {
     const [hovering, setHovering] = useState(false)
     const avatarAccent = useRef()
     const userData = useAuth().user
@@ -39,5 +39,3 @@ function Profile() {
         </NavMenu>
     )
 }
-
-export default Profile

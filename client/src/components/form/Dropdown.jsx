@@ -1,8 +1,8 @@
 import { useState } from "react"
-import Button from "../core/Button"
-import Menu from "../basic/Menu"
+import Button from "./Button"
+import Menu from "../utils/Menu"
 
-function Dropdown({title, options}) {
+export default function Dropdown({title, options}) {
     const [hovering, setHovering] = useState(false)
     const [selection, setSelection] = useState(title)
 
@@ -31,5 +31,3 @@ function Dropdown({title, options}) {
         </div>
     )
 }
-
-export default Dropdown

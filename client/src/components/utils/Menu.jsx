@@ -1,6 +1,6 @@
-import HoveringDiv from "../core/HoveringDiv"
+import HoveringDiv from "./HoveringDiv"
 
-function Menu({hovering, setHovering, variants, options}) {
+export default function Menu({hovering, setHovering, variants, options}) {
     return (
         <HoveringDiv
             hovering={hovering}
@@ -14,5 +14,3 @@ function Menu({hovering, setHovering, variants, options}) {
         }</HoveringDiv>
     )
 }
-
-export default Menu

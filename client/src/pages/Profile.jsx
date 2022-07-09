@@ -1,7 +1,5 @@
-function Profile() {
+export default function Profile() {
     return (
         <div>heyo</div>
     )
 }
-
-export default Profile

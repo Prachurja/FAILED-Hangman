@@ -1,7 +1,7 @@
 import { useEffect, createRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
-function HoveringDiv({hovering, setHovering, variants, children, className, closeOnClick, transitionDuration=0.15}) {
+export default function HoveringDiv({hovering, setHovering, variants, children, className, closeOnClick, transitionDuration=0.15}) {
     const mounted = createRef(false)
     
     useEffect(() => {
@@ -34,5 +34,3 @@ function HoveringDiv({hovering, setHovering, variants, children, className, clos
         </>
     )
 }
-
-export default HoveringDiv

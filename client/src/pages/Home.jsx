@@ -1,12 +1,12 @@
-import Gamemode from "../components/complex/Gamemode"
-import Dropdown from "../components/simple/Dropdown"
-import Button from "../components/core/Button"
+import Gamemode from "../components/home/Gamemode"
+import Dropdown from "../components/form/Dropdown"
+import Button from "../components/form/Button"
 import React from "react"
-import { useAuth, useSignupOpen } from "../components/core/AuthContext"
-import { openCreateParty } from "../components/basic/CreateParty"
+import { useAuth, useSignupOpen } from "../components/general/Context"
+import { openCreateParty } from "../components/home/CreateParty"
 
-function Home() {
-    const authenticated = useAuth().authenticated
+export default function Home() {
+    const [authenticated] = useAuth().authenticatedState
     const signupOpenState = useSignupOpen()
 
     return (
@@ -19,11 +19,9 @@ function Home() {
             <Gamemode
                 title="Multiplayer"
                 description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis ab eveniet, distinctio perferendis laborum nesciunt reprehenderit dignissimos illum perspiciatis aliquam veniam totam quas maxime odit non in similique dolor consequuntur, nulla natus! Id, modi fugiat ratione doloribus porro at iure culpa hic natus eaque maxime. Dolorem nisi sit atque facilis."
-                play={<Dropdown select={true} title="Play" options={[{title: "Join Party"}, {title: "Create Party", onClick: authenticated ? openCreateParty : (() => signupOpenState.setSignupOpen(true))}]} />}
+                play={<Dropdown select={true} title="Play" options={[{title: "Join Party"}, {title: "Create Party", onClick: authenticated ? openCreateParty : (() => signupOpenState[1](true))}]} />}
                 arrangeReverse={true}
             />
         </div>
     )
 }
-
-export default Home

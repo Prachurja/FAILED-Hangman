@@ -1,27 +1,27 @@
-import { SignupButton } from "../basic/AuthButtons";
-import AuthModal from "../basic/AuthModal";
-import { useLoginOpen } from "../core/AuthContext";
+import { useState } from "react";
+import { SignupButton } from "./Buttons";
+import AuthModal from "./AuthModal";
+import { useLoginOpen } from "../general/Context";
+import Image from "../notice/Image";
 
-function Login() {
+export default function Login() {
     const loginOpenState = useLoginOpen()
-
-    function handleSubmit(event) {
-        console.log("login!")
-    }
 
     return (
         <AuthModal
             name="Login"
-            fields={[
-                {
-                    name: "Username",
+            fields={{
+                "username": {
+                    title: "Username",
                     regex: /^[^#]+$/,
-                    errorText: "Username cannot contain #"
+                    errorText: "Username cannot contain #",
+                    temporaryErrorTextState: useState()
                 },
-                {
-                    name: "Password",
-                    regex: /^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).*){8,}/,
+                "password": {
+                    title: "Password",
+                    regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
                     errorText: "Password must have",
+                    temporaryErrorTextState: useState(),
                     errors: [
                         {
                             regex: /^.{8,}$/,
@@ -41,14 +41,13 @@ function Login() {
                         }
                     ]
                 }
-            ]}
+            }}
             otherAuthText="Don't have an account?"
             otherAuthButton={<SignupButton className="text-blue-500" />}
-            modalOpen={loginOpenState.loginOpen}
-            setModalOpen={loginOpenState.setLoginOpen}
-            handleSubmit={handleSubmit}
+            modalOpen={loginOpenState[0]}
+            setModalOpen={loginOpenState[1]}
+            submitURL="http://localhost:5000/api/auth/login"
+            successImage={<Image iconClass="fa-circle-check" colorClass="text-emerald-500" title="Success!" />}
         />
     )
 }
-
-export default Login
