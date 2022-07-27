@@ -4,11 +4,12 @@ import Field from "../form/Field"
 import google from "../../assets/icons/google.png"
 import facebook from "../../assets/icons/facebook.png"
 import apple from "../../assets/icons/apple.png"
-import { useNoticeData } from "../general/Context"
+import { useNoticeData } from "../contexts/ModalsContext"
 import { useState } from "react"
+import axios from "axios"
 
 
-export default function AuthModal({ name, fields, otherAuthText, otherAuthButton, modalOpen, setModalOpen, submitURL, successImage }) {
+export default function AuthModal({ name, fields, otherAuthText, otherAuthButton, modalOpen, setModalOpen, submitURL, successImage, additionalOnSubmit }) {
     const tempValidityChart = {}
 
     Object.keys(fields).forEach(key => {
@@ -40,30 +41,26 @@ export default function AuthModal({ name, fields, otherAuthText, otherAuthButton
             })
 
             if(Object.keys(fields).filter(key => (key in formInput) && fields[key].regex.test(formInput[key])).length === Object.values(formInput).length) {
-                const res = await fetch(submitURL, {
-                    headers: {"Content-Type": "application/json", "Accept": "application/json"},
-                    method: "POST",
-                    body: JSON.stringify(formInput)
-                })
+                axios.post(submitURL, formInput).then(res => {
+                    const body = res.data
 
-                const body = await res.json()
-
-                if(res.ok) {
                     setModalOpen(false)
                     noticeData.modalOpenState[1](true)
                     noticeData.imageState[1](successImage)
                     noticeData.noticeState[1](body.message)
 
-                    setTimeout(() => noticeData.modalOpenState[1](false), body.message.split(" ").length * 500)
-                }
+                    additionalOnSubmit(body)
 
-                else {
+                    setTimeout(() => noticeData.modalOpenState[1](false), body.message.split(" ").length * 500)
+                }).catch(err => {
+                    const body = err.response.data
+                    
                     Object.keys(body.message).forEach(key => {
                         const setTemporaryErrorText = fields[key].temporaryErrorTextState[1]
                         setTemporaryErrorText(body.message[key])
                         setTimeout(() => setTemporaryErrorText(), 1000)
                     })
-                }
+                })
             }
         }
     }

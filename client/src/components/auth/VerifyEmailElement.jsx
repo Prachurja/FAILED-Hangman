@@ -1,33 +1,33 @@
 import { useParams, Navigate } from "react-router-dom"
-import { useEffect } from "react"
-import { useAuth, useNoticeData } from "../general/Context"
+import { useEffect, useRef } from "react"
+import { useAuth } from "../contexts/AuthContext"
+import { useNoticeData } from "../contexts/ModalsContext"
 import Image from "../notice/Image"
-import Cookies from "universal-cookie"
+import axios from "axios"
 
 export default function VerifyEmailElement() {
     const {verifyemailtoken} = useParams()
     const noticeData = useNoticeData()
     const setAuthenticated = useAuth().authenticatedState[1]
+    const userData = useAuth().user
+    const body = useRef()
   
-    //eslint-disable-next-line
-    useEffect(async () => {
-      const res = await fetch(`http://localhost:5000/api/auth/verifyemail/${verifyemailtoken}`, {
-        headers: {"Content-Type": "application/json", "Accept": "application/json"},
-        method: "POST"
-      })
-  
-      const body = await res.json()
-
-      if(res.ok) {
+    useEffect(() => {
+      axios.post(`http://localhost:5000/api/auth/verifyemail/${verifyemailtoken}`).then(async res => {
+        body.current = res.data
         setAuthenticated(true)
-        new Cookies().set("token", body.token, {httpOnly: true, path: "/"})
-      }
-
-      noticeData.imageState[1](res.ok ? <Image iconClass="fa-circle-check" colorClass="text-emerald-500" title="Success!" /> : <Image iconClass="fa-circle-xmark" colorClass="text-red-500" title="Failure" />)
-      noticeData.modalOpenState[1](true)
-      noticeData.noticeState[1](body.message)
-      setTimeout(() => noticeData.modalOpenState[1](false), body.message.split(" ").length * 500)
-    }, [verifyemailtoken, noticeData, setAuthenticated])
+        userData.current.id = body.current.userID
+        noticeData.imageState[1](<Image iconClass="fa-circle-check" colorClass="text-emerald-500" title="Success!" />)
+      }).catch(err => {
+        body.current = err.response.data
+        noticeData.imageState[1](<Image iconClass="fa-circle-xmark" colorClass="text-red-500" title="Failure" />)
+      }).finally(() => {
+        noticeData.modalOpenState[1](true)
+        noticeData.noticeState[1](body.current.message)
+        setTimeout(() => noticeData.modalOpenState[1](false), body.current.message.split(" ").length * 500)
+      })
+      //eslint-disable-next-line
+    }, [verifyemailtoken, noticeData, setAuthenticated, userData])
   
     return (
       <Navigate to="/" />

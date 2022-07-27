@@ -1,11 +1,10 @@
 const User = require("../models/User")
 const jwt = require("jsonwebtoken")
-const Cookies = require("universal-cookie")
 
 module.exports = async (req, res, next) => {
     try {
         let success = false
-        const token = new Cookies(req.headers.cookie).get("token")
+        const token = req?.cookies?.token
 
         if(token) {
             let {_id, iat} = jwt.verify(token, process.env.JWT_SECRET + "login")

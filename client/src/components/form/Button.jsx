@@ -1,4 +1,5 @@
-import { useAuth, useSignupOpen } from "../general/Context"
+import { useAuth } from "../contexts/AuthContext"
+import { useSignupOpen } from "../contexts/ModalsContext"
 
 export default function Button({children, className, onClick, requiresAuth = false}) {
     function useGetOnClick() {

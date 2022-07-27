@@ -1,5 +1,5 @@
 import Entry from "../auth/Entry"
-import { useAuth } from "../general/Context"
+import { useAuth } from "../contexts/AuthContext"
 import Profile from "../auth/Profile"
 
 export default function Header() {

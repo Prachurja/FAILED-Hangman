@@ -1,20 +1,31 @@
 import { useState } from "react";
 import { SignupButton } from "./Buttons";
 import AuthModal from "./AuthModal";
-import { useLoginOpen } from "../general/Context";
+import { useLoginOpen } from "../contexts/ModalsContext";
 import Image from "../notice/Image";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
     const loginOpenState = useLoginOpen()
+    
+    const userData = useAuth().user
+    const setAuthenticated = useAuth().authenticatedState[1]
+
+    function additionalOnSubmit(body) {
+        userData.current.id = body.id
+        userData.current.avatar = body.avatar
+        userData.current.username = body.username
+        setAuthenticated(true)
+    }
 
     return (
         <AuthModal
             name="Login"
             fields={{
-                "username": {
-                    title: "Username",
-                    regex: /^[^#]+$/,
-                    errorText: "Username cannot contain #",
+                "email": {
+                    title: "Email",
+                    regex: /^(([\w\d].{0,62}[\w\d])|([\w\d]{1,64}))@(?=.{1,63}(\..{1,63}){1,2}$)[\d\w]+-?[\d\w]+(\.[\d\w]+-?[\d\w]+){1,2}$/,
+                    errorText: "Please provide a valid email",
                     temporaryErrorTextState: useState()
                 },
                 "password": {
@@ -48,6 +59,7 @@ export default function Login() {
             setModalOpen={loginOpenState[1]}
             submitURL="http://localhost:5000/api/auth/login"
             successImage={<Image iconClass="fa-circle-check" colorClass="text-emerald-500" title="Success!" />}
+            additionalOnSubmit={additionalOnSubmit}
         />
     )
 }

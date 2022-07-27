@@ -2,7 +2,8 @@ import Gamemode from "../components/home/Gamemode"
 import Dropdown from "../components/form/Dropdown"
 import Button from "../components/form/Button"
 import React from "react"
-import { useAuth, useSignupOpen } from "../components/general/Context"
+import { useAuth } from "../components/contexts/AuthContext"
+import { useSignupOpen } from "../components/contexts/ModalsContext"
 import { openCreateParty } from "../components/home/CreateParty"
 
 export default function Home() {

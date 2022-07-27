@@ -4,6 +4,18 @@ const jwt = require("jsonwebtoken")
 const sendEmail = require("../utils/sendEmail")
 const path = require("path")
 const fs = require("fs")
+const auth = require("../middleware/auth")
+
+router.post("/check", auth, (req, res, next) => {
+    try {
+        const { _id: userID } = jwt.verify(req.cookies.token, process.env.JWT_SECRET + "login")
+        res.status(200).send({ id: userID, avatar: req.user.avatar, username: req.user.username })
+    }
+
+    catch(err) {
+        next(err)
+    }
+})
 
 router.post("/login", async (req, res, next) => {
     try {
@@ -17,15 +29,21 @@ router.post("/login", async (req, res, next) => {
         if(email && password) {
             const user = await User.findOne({ email })
 
-            if(user && user.matchPassword(password)) res.send({ token: user.generateJWT(process.env.JWT_SECRET + "login"), message: "Login successful" })
-            else res.status(401).send({ message: "Invalid email or password" })
+            if(user && user.matchPassword(password)) {
+                res.cookie("token", user.generateJWT(process.env.JWT_SECRET + "login"), {path: "/", httpOnly: true})
+                res.status(200).send({ message: "Login successful", id: user._id, avatar: user.avatar, username: user.username })
+            }
+
+            else res.status(401).send({ message: {
+                email: "Invalid email or password",
+                password: "Invalid email or password"
+            } })
         }
 
         else res.status(400).send({ message: errorMessage })
     }
 
     catch(err) {
-        console.log(err.message)
         next(err)
     }
 })
@@ -98,10 +116,22 @@ router.post("/verifyemail/:verifyemailtoken", async (req, res, next) => {
             user.expireAt = undefined
             await user.save()
             
-            res.status(200).send({ message: "Email verified successfully", token: user.generateJWT(process.env.JWT_SECRET + "login") })
+            res.cookie("token", user.generateJWT(process.env.JWT_SECRET + "login"), {path: "/", httpOnly: true})
+            res.status(200).send({ message: "Email verified successfully", userID: _id })
         }
 
         else res.status(404).send({ message: "Email verification token expired" })
+    }
+
+    catch(err) {
+        next(err)
+    }
+})
+
+router.post("/signout", (req, res, next) => {
+    try {
+        res.clearCookie("token")
+        res.status(200).send({ message: "You've been successfully logged out"})
     }
 
     catch(err) {

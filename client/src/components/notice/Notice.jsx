@@ -1,4 +1,4 @@
-import { useNoticeData } from "../general/Context";
+import { useNoticeData } from "../contexts/ModalsContext";
 import Modal from "../utils/Modal";
 
 export function Notice() {

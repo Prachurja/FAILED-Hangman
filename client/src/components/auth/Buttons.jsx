@@ -1,4 +1,4 @@
-import { useSignupOpen, useLoginOpen } from "../general/Context"
+import { useSignupOpen, useLoginOpen } from "../contexts/ModalsContext"
 
 export function LoginButton({ additionalOnClick, className }) {
     const signupOpenState = useSignupOpen()

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LoginButton } from "./Buttons";
 import AuthModal from "./AuthModal";
-import { useSignupOpen } from "../general/Context";
+import { useSignupOpen } from "../contexts/ModalsContext";
 import Image from "../notice/Image";
 
 export default function Signup() {
