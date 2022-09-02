@@ -6,10 +6,16 @@ const path = require("path")
 const fs = require("fs")
 const auth = require("../middleware/auth")
 
-router.post("/check", auth, (req, res, next) => {
+router.post("/check", auth(false), (req, res, next) => {
     try {
-        const { _id: userID } = jwt.verify(req.cookies.token, process.env.JWT_SECRET + "login")
-        res.status(200).send({ id: userID, avatar: req.user.avatar, username: req.user.username })
+        if(req.cookies.user) {
+            const { _id: userID } = jwt.verify(req.cookies.token, process.env.JWT_SECRET + "login")
+            res.status(200).send({ id: userID, avatar: req.user.avatar, username: req.user.username })
+        }
+
+        else {
+            res.sendStatus(200)
+        }
     }
 
     catch(err) {
@@ -41,6 +47,26 @@ router.post("/login", async (req, res, next) => {
         }
 
         else res.status(400).send({ message: errorMessage })
+    }
+
+    catch(err) {
+        next(err)
+    }
+})
+
+router.post("/thirdpartylogin", async (req, res, next) => {
+    try {
+        const { email } = req.body
+        const user = await User.findOne({email})
+
+        if(user) {
+            res.cookie("token", user.generateJWT(process.env.JWT_SECRET + "login"), {path: "/", httpOnly: true})
+            res.status(200).send({ message: "Login successful", id: user._id, avatar: user.avatar, username: user.username })
+        }
+
+        else {
+            res.sendStatus(400)
+        }
     }
 
     catch(err) {
@@ -84,6 +110,46 @@ router.post("/signup", async (req, res, next) => {
         }
 
         else res.status(409).send({ message: { email: "Email already exists"}})
+    }
+
+    catch(err) {
+        next(err)
+    }
+})
+
+router.post("/thirdpartysignup", async (req, res, next) => {
+    try {
+        const { username, email } = req.body
+        
+        if(!await User.findOne({ email })) {
+            let getNewDiscriminator = () => `${Math.round(Math.random() * 9999)}`.padStart(4, "0")
+            let discriminator = getNewDiscriminator()
+            let fulfilled = false
+
+            if((await User.find({ username })).length < 30) {
+                for(let i = 1; i <= 5 && !fulfilled; i++) {
+                    if(!await User.findOne({ username, discriminator })) {
+                        function getRandomAvatarURL() {
+                            const defaultAvatarsCount = fs.readdirSync(path.join(__dirname, "../uploads/avatars/default")).length
+                            const random = Math.floor(Math.random() * (defaultAvatarsCount - 1)) + 1
+                            return `http://localhost:5000/uploads/avatars/default/${random}.jpg`
+                        }
+
+                        const newUser = await User.create({ username, discriminator, email, avatar: getRandomAvatarURL() })
+                        res.cookie("token", newUser.generateJWT(process.env.JWT_SECRET + "login"), {path: "/", httpOnly: true})
+                        res.status(200).send({ message: "Login successful", id: newUser._id, avatar: newUser.avatar, username: newUser.username })
+
+                        fulfilled = true
+                    }
+    
+                    else discriminator = getNewDiscriminator()
+                }
+            }
+
+            if(!fulfilled) res.status(400).send({ message: { username: "Username too common" }})
+        }
+
+        else res.status(409).send({ message: { email: "Email already exists" }})
     }
 
     catch(err) {

@@ -1,8 +1,8 @@
 import { useState } from "react"
 import ErrorText from "./ErrorText"
 
-export default function Field({ name, title, regex, errorText, temporaryErrorText, errors }) {
-    const [value, setValue] = useState("")
+export default function Field({ name, title, type="text", regex, errorText, temporaryErrorText, errors, value: v="" }) {
+    const [value, setValue] = useState(v)
 
     const hasError = () => (value !== "" && !regex.test(value)) || temporaryErrorText
     const handleChange = (event) => {
@@ -21,11 +21,10 @@ export default function Field({ name, title, regex, errorText, temporaryErrorTex
             />
             <div className="relative grid items-center ">
                 <input
-                    type="text"
+                    type={type}
                     placeholder={title}
                     name={name}
                     id={name}
-                    autoComplete="none"
                     spellCheck={false}
                     value={value}
                     onChange={handleChange}

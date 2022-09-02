@@ -20,11 +20,14 @@ export default function App() {
   useEffect(() => {
     axios.post("http://localhost:5000/api/auth/check").then(async res => {
       const body = res.data
-      userData.current.id = body.id
-      userData.current.avatar = body.avatar
-      userData.current.username = body.username
-      setAuthenticated(true)
-    }).catch(() => {}).finally(() => setLoading(false))
+      
+      if(body.id) {
+        userData.current.id = body.id
+        userData.current.avatar = body.avatar
+        userData.current.username = body.username
+        setAuthenticated(true)
+      }
+    }).catch(err => console.log(err)).finally(() => setLoading(false))
     //eslint-disable-next-line
   }, [])
 

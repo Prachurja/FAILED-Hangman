@@ -1,7 +1,7 @@
 const User = require("../models/User")
 const jwt = require("jsonwebtoken")
 
-module.exports = async (req, res, next) => {
+module.exports = (throw401=true) => async (req, res, next) => {
     try {
         let success = false
         const token = req?.cookies?.token
@@ -19,8 +19,12 @@ module.exports = async (req, res, next) => {
             }
         }
 
-        if(!success) {
+        if(!success && throw401) {
             res.status(401).send({ message: "Please login" })
+        }
+
+        else {
+            next()
         }
     }
 

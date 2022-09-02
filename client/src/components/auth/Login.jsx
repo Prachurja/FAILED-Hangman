@@ -24,12 +24,14 @@ export default function Login() {
             fields={{
                 "email": {
                     title: "Email",
+                    type: "email",
                     regex: /^(([\w\d].{0,62}[\w\d])|([\w\d]{1,64}))@(?=.{1,63}(\..{1,63}){1,2}$)[\d\w]+-?[\d\w]+(\.[\d\w]+-?[\d\w]+){1,2}$/,
                     errorText: "Please provide a valid email",
                     temporaryErrorTextState: useState()
                 },
                 "password": {
                     title: "Password",
+                    type: "password",
                     regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
                     errorText: "Password must have",
                     temporaryErrorTextState: useState(),

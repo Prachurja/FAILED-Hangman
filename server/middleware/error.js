@@ -9,7 +9,7 @@ module.exports = (err, req, res, next) => {
             errors[key] = properties.message
         })
 
-        res.status(400).send({ message: errors[0].message })
+        res.status(400).send({ message: errors })
     }
 
     else if(err instanceof jwt.JsonWebTokenError) {

@@ -9,7 +9,7 @@ export default function ErrorText({value, errorText, temporaryErrorText, errors,
                 hidden: { opacity: 0, height: "0" },
                 visible: { opacity: 1, height: "auto" }
             }}
-            className="text-[0.7rem] text-red-500 [font-weight:500_!important] overflow-hidden"
+            className="flex text-[0.7rem] text-red-500 [font-weight:500_!important] overflow-hidden"
             closeOnClick={false}
         >
             {temporaryErrorText ? temporaryErrorText : errorText}
